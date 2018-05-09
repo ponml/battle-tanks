@@ -30,5 +30,8 @@ public:
 
 	void AimAt(FVector HitLocation);
 	
+	//makes a method we can call from blueprint called SetBarrelReference
+	UFUNCTION(BlueprintCallable, Category = Setup)
+	void SetBarrelReference(UStaticMeshComponent* BarrelToSet);
 	
 };
