@@ -41,6 +41,7 @@ void ATankPlayerController::AimTowardsCrossHair()
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Look direction %s"), *(HitLocation.ToString()));		
 		//TODO tell tank to aim at this point
+		GetControlledTank()->AimAt(HitLocation);
 	}
 }
 
@@ -48,19 +49,24 @@ void ATankPlayerController::AimTowardsCrossHair()
 bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) const {
 	
 	// find the crosshair position in pixel coords
-	OutHitLocation = FVector(1.f);
+	OutHitLocation = FVector(0.f);
 	int32 viewPortSizeX;
 	int32 viewPortSizeY;
 	GetViewportSize(viewPortSizeX, viewPortSizeY);
 	FVector2D ScreenPixelLocation = FVector2D(viewPortSizeX * CrossHairXLocation, viewPortSizeY * CrossHairYLocation);
 
+	//out, unit vector
 	FVector LookDirection;
 	if (GetLookDirection(ScreenPixelLocation, LookDirection)) {
-		UE_LOG(LogTemp, Warning, TEXT("LookDirection:  %s"), *(LookDirection.ToString()));
+		// line-trace along that direction (look direction), and see what we hit, up to a max range
+		//UE_LOG(LogTemp, Warning, TEXT("LookDirection:  %s"), *(LookDirection.ToString()));
+		if (GetLookVectorHitLocation(LookDirection, OutHitLocation)) {
+			//UE_LOG(LogTemp, Warning, TEXT("HitLocation:  %s"), *(OutHitLocation.ToString()));
+			return true;
+		}
 	}
-	// line-trace along that direction (look direction), and see what we hit, up to a max range
 
-	return true;
+	return false;
 }
 
 bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector &LookDirection) const {
@@ -71,4 +77,20 @@ bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector &
 		CameraWorldLocation, 
 		LookDirection
 	);
+}
+
+bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector &HitLocation) const {
+
+	FVector Start = PlayerCameraManager->GetCameraLocation();
+	FVector End = Start + (LookDirection * LineTraceRange);
+	FHitResult HitResult;
+	auto hasHit = GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		ECollisionChannel::ECC_Visibility
+	);
+	HitLocation = hasHit ? HitResult.Location : FVector(0);
+	return hasHit;
+
 }

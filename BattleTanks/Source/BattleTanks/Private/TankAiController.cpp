@@ -24,6 +24,22 @@ void ATankAiController::BeginPlay()
 	}
 }
 
+void ATankAiController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	AimTowardsPlayerTank();
+}
+
+void ATankAiController::AimTowardsPlayerTank() {
+	auto myTank = GetControlledTank();
+	auto playerTank = GetPlayerTank();
+
+	if (playerTank) {
+		auto playerLocation = playerTank->GetActorLocation();
+		myTank->AimAt(playerLocation);
+	}
+}
+
 ATank* ATankAiController::GetControlledTank() const
 {
 	return Cast<ATank>(GetPawn()); //returns pawn the playercontroller is possession (since this is inheritting from PlayerController)
