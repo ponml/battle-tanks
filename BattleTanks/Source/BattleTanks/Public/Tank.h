@@ -33,5 +33,9 @@ public:
 	//makes a method we can call from blueprint called SetBarrelReference
 	UFUNCTION(BlueprintCallable, Category = Setup)
 	void SetBarrelReference(UStaticMeshComponent* BarrelToSet);
+
+private:
+	UPROPERTY(EditAnywhere, Category = Firing)
+	float LaunchSpeed = 10000.f;
 	
 };
