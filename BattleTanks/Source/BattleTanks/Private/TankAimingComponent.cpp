@@ -2,6 +2,7 @@
 
 #include "TankAimingComponent.h"
 #include "Engine.h"
+#include "TankBarrel.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -16,26 +17,7 @@ UTankAimingComponent::UTankAimingComponent()
 	// ...
 }
 
-
-// Called when the game starts
-void UTankAimingComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
-// Called every frame
-void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
-void UTankAimingComponent::SetBarrelReference(UStaticMeshComponent* BarrelToSet)
+void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
 {
 	//this->Barrel
 	Barrel = BarrelToSet;
@@ -53,7 +35,7 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed) {
 	FVector OutLaunchVelocity;
 	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
 	
-	auto foundLaunchVelocity = UGameplayStatics::SuggestProjectileVelocity(
+	auto bHasAimSolution = UGameplayStatics::SuggestProjectileVelocity(
 		this,
 		OutLaunchVelocity,
 		StartLocation,
@@ -65,13 +47,24 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed) {
 		ESuggestProjVelocityTraceOption::DoNotTrace
 	);
 
-	if (foundLaunchVelocity) {
+	if (bHasAimSolution) {
 		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
-		auto TankName = GetOwner()->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s"), *TankName, *AimDirection.ToString());
+		//auto TankName = GetOwner()->GetName();
+		//UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s"), *TankName, *AimDirection.ToString());
+		MoveBarrelTowards(AimDirection);
 
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Firing at %f"), LaunchSpeed);
 }
 
+void UTankAimingComponent::MoveBarrelTowards(FVector Direction) {
+	//work out dif between current barrel rotation and aim direction
+	//move the barrel the right amount this frame
+	//given a max elevation speed and the frame time
+	auto BarrelRotation = Barrel->GetForwardVector().Rotation(); //gets the FRotator based on the direction vec the barrel faces in (the x? )
+	auto AimAsRotator = Direction.Rotation();
+	auto DeltaRotator = AimAsRotator - BarrelRotation;
+	Barrel->Elevate(5);
+
+}

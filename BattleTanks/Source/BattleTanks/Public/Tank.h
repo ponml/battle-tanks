@@ -7,6 +7,9 @@
 #include "TankAimingComponent.h"
 #include "Tank.generated.h"
 
+class UTankBarrel; //forward declaration
+
+
 UCLASS()
 class BATTLETANKS_API ATank : public APawn
 {
@@ -32,7 +35,7 @@ public:
 	
 	//makes a method we can call from blueprint called SetBarrelReference
 	UFUNCTION(BlueprintCallable, Category = Setup)
-	void SetBarrelReference(UStaticMeshComponent* BarrelToSet);
+	void SetBarrelReference(UTankBarrel* BarrelToSet);
 
 private:
 	UPROPERTY(EditAnywhere, Category = Firing)
