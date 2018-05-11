@@ -52,10 +52,16 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed) {
 		//auto TankName = GetOwner()->GetName();
 		//UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s"), *TankName, *AimDirection.ToString());
 		MoveBarrelTowards(AimDirection);
+		auto Time = GetWorld()->GetTimeSeconds();
+		UE_LOG(LogTemp, Warning, TEXT("%f aim solution found"), Time);
+	}
+	else {
 
+		auto Time = GetWorld()->GetTimeSeconds();
+		UE_LOG(LogTemp, Warning, TEXT("%f NO AIM SOLUTION FOUND"), Time);
 	}
 
-	//UE_LOG(LogTemp, Warning, TEXT("Firing at %f"), LaunchSpeed);
+	
 }
 
 void UTankAimingComponent::MoveBarrelTowards(FVector Direction) {
@@ -65,6 +71,8 @@ void UTankAimingComponent::MoveBarrelTowards(FVector Direction) {
 	auto BarrelRotation = Barrel->GetForwardVector().Rotation(); //gets the FRotator based on the direction vec the barrel faces in (the x? )
 	auto AimAsRotator = Direction.Rotation();
 	auto DeltaRotator = AimAsRotator - BarrelRotation;
-	Barrel->Elevate(5);
+
+	//1 here means 100% speed
+	Barrel->Elevate(DeltaRotator.Pitch);
 
 }
