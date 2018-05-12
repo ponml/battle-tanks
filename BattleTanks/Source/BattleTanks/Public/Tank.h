@@ -7,9 +7,9 @@
 #include "Tank.generated.h"
 
 //forward declarations
-class UTankBarrel; 
 class UTankTurret;
 class UTankAimingComponent;
+class AProjectile;
 
 UCLASS()
 class BATTLETANKS_API ATank : public APawn
@@ -45,5 +45,10 @@ public:
 private:
 	UPROPERTY(EditAnywhere, Category = Firing)
 	float LaunchSpeed = 10000.f;
-	
+
+	UPROPERTY(EditAnywhere, Category = Setup)
+	TSubclassOf<AProjectile> ProjectileBluePrint; //alt.  could be using TsubclassOf
+
+	//local barel reference for spawning projectile
+	UTankBarrel* Barrel = nullptr;
 };

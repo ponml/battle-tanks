@@ -3,11 +3,14 @@
 #include "Projectile.h"
 
 
+
 // Sets default values
 AProjectile::AProjectile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(FName("Movement Component")); //could also add a blueprint to do this
+	MovementComponent->bAutoActivate = false;
 
 }
 
@@ -23,5 +26,12 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AProjectile::LaunchProjectile(float Speed)
+{
+	UE_LOG(LogTemp, Warning, TEXT("FIRING at speed %f"), Speed);
+	MovementComponent->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
+	MovementComponent->Activate();
 }
 
